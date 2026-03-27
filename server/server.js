@@ -234,7 +234,7 @@ app.post('/api/gerar-imagem', async (req, res) => {
   }
 });
 
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   const status = config.geminiApiKey ? '✅ Gemini API Key ativa (gemini-3-pro-image-preview)' : '⚠️  Configure API Key para qualidade máxima';
   console.log(`\n🎨 EDS Visual v2 | http://localhost:${PORT}`);
