@@ -1,5 +1,4 @@
 const express = require('express');
-app.use(express.static(path.join(__dirname, '..')));
 const cors = require('cors');
 const { GoogleAuth } = require('google-auth-library');
 const path = require('path');
@@ -24,6 +23,8 @@ const auth = new GoogleAuth({
 });
 
 const app = express();
+app.use(express.static(path.join(__dirname, '..')));
+
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static(path.join(__dirname, '..')));
