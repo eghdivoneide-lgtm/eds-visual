@@ -1,0 +1,21 @@
+{
+  "name": "EDS Premium Visual",
+  "short_name": "EDS Visual",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Artista Visual IA - Powered by Gemini e Vertex AI.",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=EDS+Visual&background=0D8ABC&color=fff&size=192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://ui-avatars.com/api/?name=EDS+Visual&background=0D8ABC&color=fff&size=512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
