@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ARTISTA VISUAL IA | EDS PREMIUM</title>
+    <!-- PWA Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=EDS+Visual&background=0D8ABC&color=fff&size=192">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a; /* Dark theme base */
+            background-image: radial-gradient(circle at top right, #1e1b4b, #0f172a 50%, #020617);
+            min-height: 100vh;
+            color: #f8fafc;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .header h1 { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 4px; }
+        .header p { font-size: 13px; color: #94a3b8; }
+
+        .config-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .config-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .container { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .card h2 { font-size: 20px; margin-bottom: 16px; color: #f1f5f9; font-weight: 600; }
+
+        .upload-zone {
+            border: 2px dashed rgba(100, 116, 139, 0.5);
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .upload-zone:hover { border-color: #a855f7; background: rgba(168, 85, 247, 0.05); transform: translateY(-2px); }
+        .upload-zone .icon { font-size: 64px; margin-bottom: 16px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        .upload-zone p { font-size: 16px; color: #cbd5e1; }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 12px;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); }
+        .btn-primary:active { transform: scale(0.98); }
+        
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .style-card {
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .style-card::before {
+            content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.2));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .style-card:hover { transform: translateY(-4px); border-color: #a855f7; }
+        .style-card:hover::before { opacity: 1; }
+        .style-card.selected { border-color: #a855f7; background: rgba(168,85,247,0.15); box-shadow: 0 0 20px rgba(168,85,247,0.2); transform: scale(1.02); }
+        .style-card .emoji { font-size: 38px; margin-bottom: 12px; position: relative; z-index: 2; }
+        .style-card .name { font-size: 14px; font-weight: 600; color: #f8fafc; margin-bottom: 4px; position: relative; z-index: 2; }
+        .style-card .desc { font-size: 11px; color: #94a3b8; line-height: 1.3; position: relative; z-index: 2; }
+
+        /* Custom Input Textarea */
+        .manual-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f1f5f9;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+        .manual-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        .manual-input::placeholder { color: #64748b; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .option-btn {
+            padding: 14px 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            text-align: center;
+            color: #cbd5e1;
+        }
+        .option-btn:hover { background: rgba(255,255,255,0.05); }
+        .option-btn.selected { border-color: #3b82f6; background: rgba(59,130,246,0.15); color: white; font-weight: 600; }
+
+        .preview-img { width: 100%; border-radius: 16px; margin-top: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+        /* Image Comparisson Slider */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            aspect-ratio: 1/1; /* Default to square, gets overridden dynamically */
+            background: #000;
+        }
+        .slider-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .slider-img-after {
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+        .slider-handle {
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            width: 4px;
+            background: white;
+            cursor: ew-resize;
+            transform: translateX(-50%);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .slider-handle::after {
+            content: '↔';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 50%;
+            color: #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .slider-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: ew-resize; z-index: 20;
+        }
+        .badge-before { position: absolute; bottom: 16px; left: 16px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 20px; font-size: 12px; backdrop-filter: blur(4px); pointer-events: none; z-index: 5;}
+        .badge-after { position: absolute; bottom: 16px; right: 16px; background: rgba(168,85,247,0.8); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; backdrop-filter: blur(4px); pointer-events: none; z-index: 5;}
+
+        /* Loading */
+        .loading { text-align: center; padding: 60px 20px; }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #a855f7;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            animation: spin 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) infinite;
+            margin: 0 auto 24px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .progress-bar-wrap { width: 100%; background: rgba(255,255,255,0.1); border-radius: 100px; height: 6px; margin-top: 30px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #a855f7, #3b82f6); background-size: 200% 100%; border-radius: 100px; width: 0%; transition: width 0.5s ease; animation: progressGradient 2s linear infinite; }
+        @keyframes progressGradient { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+        /* Historico / Galeria */
+        .history-title { font-size: 16px; color: #cbd5e1; margin-top: 40px; margin-bottom: 16px; font-weight: 600; }
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+        .history-item {
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .history-item:hover { transform: scale(1.05); border-color: #a855f7; }
+
+
+        .alert { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+        .alert p { color: #fca5a5; font-size: 14px; }
+
+        .hidden { display: none !important; }
+        input[type="file"] { display: none; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top:24px; }
+        .section { margin-bottom: 24px; }
+        
+        .selected-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(168,85,247,0.2);
+            border: 1px solid #a855f7;
+            color: #e9d5ff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-top: 8px;
+        }
+        
+        @media(min-width: 768px){
+            .slider-container { max-height: 75vh; width: auto; max-width: 100%; margin: 20px auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>✨ EDS Premium Visual</h1>
+    <p>Powered by Google Vertex AI & Gemini Ultra</p>
+    <button class="config-btn" onclick="mostrarPainelKey()">⚙️ API Key</button>
+</div>
+
+<div class="container">
+    <!-- Painel de configuração API Key (deslizante) -->
+    <div id="painelApiKey" class="card hidden" style="border-left: 4px solid #f59e0b; background: #fffbeb;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <span style="font-size:24px;">🔑</span>
+            <div>
+                <div style="font-weight:700;font-size:15px;color:#92400e;">Gemini API Key — Alta Qualidade</div>
+                <a href="https://aistudio.google.com/apikey" target="_blank" style="font-size:12px;color:#d97706;">→ Pegar sua chave em aistudio.google.com</a>
+            </div>
+            <button onclick="ocultarPainelKey()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:#92400e;">✕</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <input type="password" id="inputGeminiKey" placeholder="Cole sua chave AIza... aqui"
+                style="flex:1;padding:12px;border:2px solid #fcd34d;border-radius:8px;font-size:14px;outline:none;background:white;color:black;"
+                onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#fcd34d'">
+            <button onclick="salvarGeminiKey()"
+                style="padding:12px 16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;">
+                Salvar ✓
+            </button>
+        </div>
+        <div id="statusGeminiKey" style="font-size:12px;color:#15803d;margin-top:8px;display:none;">✅ Chave salva na memória! Teste gerar agora.</div>
+    </div>
+
+    <div id="alertaErro" class="alert hidden">
+        <p id="textoErro"></p>
+    </div>
+
+    <!-- TELA 1: Upload -->
+    <div id="telaUpload">
+        <div class="card">
+            <h2>📤 Iniciar Transformação</h2>
+            <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <div class="icon">✨</div>
+                <p><strong>Toque para escolher uma foto</strong></p>
+                <p style="font-size: 12px; margin-top: 8px; color: #64748b;">JPG, PNG, WEBP (Ideal pessoas com boa iluminação)</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <!-- Histórico (Aparece se houver) -->
+        <div id="historyContainer" class="hidden">
+            <div class="history-title">📚 Suas Criações Recentes</div>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+    </div>
+
+    <!-- TELA 2: Configuração -->
+    <div id="telaConfig" class="hidden">
+        <div class="card">
+            <h2>📷 Imagem Referência</h2>
+            <img id="previewOriginal" class="preview-img" alt="Preview">
+        </div>
+
+        <div class="card">
+            <div class="section">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">🎨 Estilos Premium</h3>
+                <div id="estiloSelecionadoBadge" class="hidden" style="margin-bottom: 12px;"></div>
+                <div class="style-grid" id="gridEstilos"></div>
+            </div>
+
+            <div class="section">
+                <h3 style="font-size: 16px; margin-bottom: 8px;">✏️ Ajustes Manuais Mágicos (Opcional)</h3>
+                <p style="font-size: 12px; color:#94a3b8; margin-bottom: 8px;">Quer algo específico? Dirija a cena! Ex: "Adicionar fundo chuvoso", "Oculos escuros cyberpunk".</p>
+                <textarea id="inputAjusteManual" class="manual-input" placeholder="Descreva modificações extras..."></textarea>
+            </div>
+
+            <div class="section">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">📐 Formato de Tela</h3>
+                <div class="options-grid">
+                    <div class="option-btn selected" onclick="selecionarFormato(this, 'square')">⬜ 1:1</div>
+                    <div class="option-btn" onclick="selecionarFormato(this, 'portrait')">📱 3:4</div>
+                    <div class="option-btn" onclick="selecionarFormato(this, 'landscape')">🖼️ 16:9</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">👤 Manter Traços Reais do Rosto?</h3>
+                <div class="options-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="option-btn selected" onclick="selecionarIntensidade(this, 'suave')">
+                        <strong>Sim, Rosto Fiel</strong><br><span style="font-size:11px">Apenas cenário muda de estilo</span>
+                    </div>
+                    <div class="option-btn" onclick="selecionarIntensidade(this, 'medio')">
+                        <strong>Estilizar Rosto</strong><br><span style="font-size:11px">Modifica a fisionomia também</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="voltarUpload()">Cancelar</button>
+            <button class="btn btn-primary" onclick="gerarImagem()" id="btnGerar">🌟 Criar Obra Prima</button>
+        </div>
+    </div>
+
+    <!-- TELA 3: Processando -->
+    <div id="telaProcessando" class="hidden">
+        <div class="card">
+            <div class="loading">
+                <div class="spinner"></div>
+                <h2 style="margin-bottom: 8px; font-size: 24px;">✨ Realizando Mágica</h2>
+                <p style="color: #cbd5e1; font-size: 15px;" id="statusMsg">Extraindo metadados faciais complexos...</p>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 4: Resultado -->
+    <div id="telaResultado" class="hidden">
+        <div class="card" style="padding: 16px;">
+            <h2 style="display:flex; justify-content:space-between; align-items:center;">
+                <span>✨ Resultado</span>
+                <span id="estiloResultado" style="font-size: 14px; color: #a855f7;"></span>
+            </h2>
+            
+            <div class="slider-container" id="sliderContainer">
+                <!-- Imagem Background (Original) -->
+                <img id="imagemAntes" class="slider-img" alt="Antes">
+                <!-- Imagem Foreground (Gerada) com Clip Path -->
+                <img id="imagemDepois" class="slider-img slider-img-after" alt="Depois">
+                
+                <div class="badge-before">Original</div>
+                <div class="badge-after">Modificada</div>
+
+                <!-- Input e Handle para Slider -->
+                <input type="range" class="slider-input" id="comparissonSlider" min="0" max="100" value="50" oninput="atualizarSlider(this.value)">
+                <div class="slider-handle" id="sliderHandle"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="baixarImagem()">💾 Salvar em Alta Resolução</button>
+        <button class="btn btn-secondary" style="margin-top:12px" onclick="voltarConfig()">🔄 Tentar Outro Estilo</button>
+        <button class="btn btn-secondary" style="margin-top:12px; background: rgba(0,0,0,0);" onclick="novaImagem()">🆕 Foto Diferente</button>
+    </div>
+</div>
+
+<script>
+// Mantendo a base fundamental idêntica ao original
+const BASE = 'Maintain the EXACT same people from the reference photo: same skin tone, same hair color, same facial features, same body proportions. Do NOT change ethnicity or race.';
+
+const ESTILOS = [
+    { id: 'manga',       emoji: '🎌', nome: 'Mangá/Anime',    desc: 'Traços definidos, olhos expressivos',   prompt: `${BASE} Transform into classic anime/manga style with clean cel-shaded lines, large expressive eyes, vibrant colors. Keep all ${BASE.slice(0,40)}` },
+    { id: 'dc',          emoji: '🦸', nome: 'DC Comics',      desc: 'Heroico, dramático, cores primárias',   prompt: `${BASE} Transform into DC Comics superhero illustration with bold ink lines, dramatic lighting, heroic comic book style. ` },
+    { id: 'disney',      emoji: '✨', nome: 'Disney/Pixar',   desc: '3D animado, mágico, encantador',        prompt: `${BASE} Transform into Disney/Pixar 3D animation style with soft features, warm magical lighting, charming family portrait. ` },
+    { id: 'ghibli',      emoji: '🌊', nome: 'Studio Ghibli',  desc: 'Aquarela etérea, nostálgico',           prompt: `${BASE} Transform into Studio Ghibli watercolor painting style with delicate lines, lush backgrounds, nostalgic pastoral warmth. ` },
+    { id: 'marvel',      emoji: '🃏', nome: 'Marvel Comics',  desc: 'Quadrinho moderno, dinâmico',           prompt: `${BASE} Transform into Marvel Comics style with dynamic line art, halftone patterns, bold primary colors, heroic poses. ` },
+    { id: 'cyber',       emoji: '🤖', nome: 'Cyberpunk',      desc: 'Neo-noir, néon, futurista',             prompt: `${BASE} Transform into cyberpunk style with neon glowing accents, futuristic clothing, dark city background, holographic overlays. ` },
+    { id: 'rpg',         emoji: '🎮', nome: 'RPG Épico',      desc: 'Fantasia AAA, épico',                  prompt: `${BASE} Transform into epic fantasy RPG art style with detailed armor, magical glow, dramatic fantasy landscape background. ` },
+    { id: 'street',      emoji: '🌀', nome: 'Street Art',     desc: 'Graffiti vibrante, urbano',             prompt: `${BASE} Transform into urban street art mural style with spray paint texture, bold outlines, vibrant graffiti colors on a wall. ` },
+    { id: 'renaissance', emoji: '🖼️', nome: 'Renascentista', desc: 'Pintura a óleo clássica',               prompt: `${BASE} Transform into Renaissance oil painting with chiaroscuro lighting, rich colors, classical composition, aged canvas texture. ` },
+    { id: 'fantasy',     emoji: '🧙', nome: 'Dark Fantasy',   desc: 'Medieval épico, magia',                prompt: `${BASE} Transform into dark fantasy style with glowing magical effects, dramatic shadows, mystical castle background. ` },
+    { id: 'pixel',       emoji: '🕹️', nome: 'Pixel Art',     desc: 'Retrogame 8-bit/16-bit',               prompt: `${BASE} Transform into retro 16-bit pixel art style with pixelated details, limited color palette, classic RPG game aesthetic. ` },
+    { id: 'pop',         emoji: '🎭', nome: 'Pop Art',        desc: 'Warhol, cores vibrantes',               prompt: `${BASE} Transform into Andy Warhol pop art style with flat bold colors, screen print effect, high contrast graphic design. ` },
+    { id: '3drender',    emoji: '💎', nome: 'Render 3D Premium', desc: 'Estilo Unreal Engine AAA',          prompt: `${BASE} Transform into a premium 3D render, ray-traced lighting, ultra realistic 8k CGI masterpiece, sharp focus. ` },
+    { id: 'watercolor',  emoji: '🖌️', nome: 'Aquarela Fluida',desc: 'Bordas suaves, traços manuais',         prompt: `${BASE} Transform into a masterful fluid watercolor painting, color bleeding effects, textured paper, artistic expressive brushstrokes. ` },
+    { id: 'origami',     emoji: '🦢', nome: 'Mundo Origami',   desc: 'Tudo feito de papel dobrado',           prompt: `${BASE} Transform into an origami paper craft diorama. The clothes and environment should look incredibly detailed folded paper. ` },
+    { id: 'synthwave',   emoji: '🪩', nome: 'Synthwave 80s',   desc: 'Grid neon, estética VHS',               prompt: `${BASE} Transform into 80s retrowave synthwave style, glowing grid, magenta and cyan sunset, VHS retro aesthetic. ` }
+];
+
+let imagemBase64 = '';
+let estiloAtual = '';
+let formatoAtual = 'square';
+let intensidadeAtual = 'suave';
+let imagemGeradaUrl = '';
+let progressTimer = null;
+let historico = JSON.parse(localStorage.getItem('eds_history') || '[]');
+
+// ─── PWA Service Worker ───
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registrado com sucesso:', reg.scope);
+    }).catch(err => {
+      console.log('Falha ao registrar SW:', err);
+    });
+  });
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+    // Render Styles
+    const grid = document.getElementById('gridEstilos');
+    ESTILOS.forEach(estilo => {
+        const div = document.createElement('div');
+        div.className = 'style-card';
+        div.dataset.id = estilo.id;
+        div.onclick = () => selecionarEstilo(div, estilo);
+        div.innerHTML = `
+            <div class="emoji">${estilo.emoji}</div>
+            <div class="name">${estilo.nome}</div>
+            <div class="desc">${estilo.desc}</div>
+        `;
+        grid.appendChild(div);
+    });
+
+    carregarHistorico();
+});
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { mostrarErro('Arquivo muito grande! Máximo 10MB.'); return; }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const resultado = e.target.result;
+        document.getElementById('previewOriginal').src = resultado;
+        imagemBase64 = resultado.split(',')[1];
+        document.getElementById('telaUpload').classList.add('hidden');
+        document.getElementById('telaConfig').classList.remove('hidden');
+        esconderErro();
+    };
+    reader.readAsDataURL(file);
+}
+
+function selecionarFormato(elem, formato) {
+    elem.closest('.options-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    elem.classList.add('selected');
+    formatoAtual = formato;
+}
+
+function selecionarIntensidade(elem, intensidade) {
+    elem.closest('.options-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    elem.classList.add('selected');
+    intensidadeAtual = intensidade;
+}
+
+function selecionarEstilo(elem, estilo) {
+    document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+    elem.classList.add('selected');
+    estiloAtual = estilo.id;
+
+    const badge = document.getElementById('estiloSelecionadoBadge');
+    badge.classList.remove('hidden');
+    badge.innerHTML = `<span class="selected-badge">${estilo.emoji} ${estilo.nome} selecionado</span>`;
+}
+
+async function gerarImagem() {
+    if (!estiloAtual) { mostrarErro('Selecione um estilo artístico antes de continuar!'); return; }
+
+    esconderErro();
+    document.getElementById('telaConfig').classList.add('hidden');
+    document.getElementById('telaProcessando').classList.remove('hidden');
+    iniciarProgresso();
+
+    const estilo = ESTILOS.find(e => e.id === estiloAtual);
+    const ajusteManual = document.getElementById('inputAjusteManual').value;
+    
+    const formatoTexto = {
+        square:    '1:1 square composition',
+        portrait:  '3:4 portrait orientation, vertical',
+        landscape: '16:9 landscape orientation, horizontal'
+    };
+
+    const intensidadeTexto = {
+        suave:  'Maintain strong fidelity to original subject features. Apply the style subtly.',
+        medio:  'Balance between preserving original characteristics and the artistic style transformation.'
+    };
+
+    let promptMaster = `${estilo.prompt}
+
+${intensidadeTexto[intensidadeAtual]}
+Generate in ${formatoTexto[formatoAtual]}.
+Preserve ALL physical characteristics of the original subject (face, body, expression).
+High quality, professional artistic result, detailed and expressive.`;
+
+    if (ajusteManual && ajusteManual.trim() !== '') {
+        promptMaster += `\n\nUSER EXTRA ADJUSTMENT: ${ajusteManual.trim()}`;
+    }
+
+    try {
+        atualizarStatus('Criando ponte neural segura...', 15);
+
+        // Pega a chave do localStorage para envio com o header Bearer
+        const apiKeyLocal = localStorage.getItem('eds_gemini_key');
+
+        const response = await fetch('/.netlify/functions/api/gerar-imagem', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': apiKeyLocal ? `Bearer ${apiKeyLocal}` : ''
+            },
+            body: JSON.stringify({
+                prompt: promptMaster,
+                imagemBase64: imagemBase64,
+                mimeType: 'image/jpeg'
+            })
+        });
+
+        atualizarStatus('Processando estilo generativo profundo...', 65);
+        const data = await response.json();
+
+        if (!response.ok || data.erro) throw new Error(data.erro || 'Falha na geração.');
+
+        if (data.sucesso && data.imagemBase64) {
+            imagemGeradaUrl = `data:${data.mimeType || 'image/png'};base64,${data.imagemBase64}`;
+            salvarNoHistorico(imagemGeradaUrl);
+
+            atualizarStatus('Renderização Completa!', 100);
+            setTimeout(() => {
+                pararProgresso();
+                prepararTelaResultado(estilo);
+            }, 800);
+        } else {
+            throw new Error('Retorno inválido do servidor.');
+        }
+
+    } catch (error) {
+        console.error('[EDS Visual] Erro:', error);
+        pararProgresso();
+        mostrarErro(error.message || 'Erro de conexão.');
+        document.getElementById('telaProcessando').classList.add('hidden');
+        document.getElementById('telaConfig').classList.remove('hidden');
+    }
+}
+
+// ─── Slider UI ───────────────────────────────────────────────
+function prepararTelaResultado(estilo) {
+    const originalSrc = document.getElementById('previewOriginal').src;
+    
+    document.getElementById('imagemAntes').src = originalSrc;
+    document.getElementById('imagemDepois').src = imagemGeradaUrl;
+    document.getElementById('estiloResultado').textContent = `${estilo.emoji} ${estilo.nome}`;
+    
+    // Set aspect ratio approx based on choice
+    const cont = document.getElementById('sliderContainer');
+    if(formatoAtual === 'square') cont.style.aspectRatio = '1/1';
+    else if(formatoAtual === 'portrait') cont.style.aspectRatio = '3/4';
+    else if(formatoAtual === 'landscape') cont.style.aspectRatio = '16/9';
+
+    // Reset slider
+    document.getElementById('comparissonSlider').value = 50;
+    atualizarSlider(50);
+    
+    document.getElementById('telaProcessando').classList.add('hidden');
+    document.getElementById('telaResultado').classList.remove('hidden');
+}
+
+function atualizarSlider(value) {
+    const p = value + '%';
+    document.getElementById('imagemDepois').style.clipPath = `polygon(${p} 0, 100% 0, 100% 100%, ${p} 100%)`;
+    document.getElementById('sliderHandle').style.left = p;
+}
+
+// ─── Histórico Local ─────────────────────────────────────────
+function salvarNoHistorico(urlBase64) {
+    historico.unshift(urlBase64);
+    if(historico.length > 8) historico.pop(); // Guarda os ultimos 8 na memória
+    
+    // Tenta salvar no navegador (localStorage tem limite de 5MB)
+    try {
+        localStorage.setItem('eds_history', JSON.stringify(historico));
+    } catch (e) {
+        console.warn('LocalStorage limit reached. Keeping history in memory only.');
+        // Tenta salvar pelo menos a última imagem se der espaço
+        try {
+            localStorage.setItem('eds_history', JSON.stringify([historico[0]]));
+        } catch (e2) {
+            // Se nem 1 imagem couber, removemos para evitar travar
+            localStorage.removeItem('eds_history');
+        }
+    }
+}
+
+function carregarHistorico() {
+    if(historico.length === 0) return;
+    const container = document.getElementById('historyContainer');
+    const grid = document.getElementById('historyGrid');
+    
+    grid.innerHTML = '';
+    historico.forEach(url => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<img src="${url}">`;
+        // Ao clicar, poderia levar para preview, por enquanto só exibimos
+        grid.appendChild(div);
+    });
+    container.classList.remove('hidden');
+}
+
+// ─── Utils ───────────────────────────────────────────────────
+function iniciarProgresso() {
+    let progress = 0;
+    document.getElementById('progressBar').style.width = '2%';
+    progressTimer = setInterval(() => {
+        if (progress < 85) {
+            progress += Math.random() * 2;
+            document.getElementById('progressBar').style.width = Math.min(progress, 85) + '%';
+        }
+    }, 500);
+}
+
+function atualizarStatus(msg, pct) {
+    document.getElementById('statusMsg').textContent = msg;
+    document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function pararProgresso() { clearInterval(progressTimer); document.getElementById('progressBar').style.width = '0%'; }
+
+function baixarImagem() {
+    const link = document.createElement('a');
+    link.href = imagemGeradaUrl;
+    link.download = `EDS_Premium_Art_${Date.now()}.png`;
+    link.click();
+}
+
+function voltarUpload() {
+    document.getElementById('telaConfig').classList.add('hidden');
+    document.getElementById('telaUpload').classList.remove('hidden');
+}
+
+function voltarConfig() {
+    document.getElementById('telaResultado').classList.add('hidden');
+    document.getElementById('telaConfig').classList.remove('hidden');
+}
+
+function novaImagem() {
+    document.getElementById('telaResultado').classList.add('hidden');
+    document.getElementById('telaUpload').classList.remove('hidden');
+    carregarHistorico(); // Atualiza painel historico
+    imagemBase64 = '';
+    estiloAtual = '';
+    imagemGeradaUrl = '';
+    document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('estiloSelecionadoBadge').classList.add('hidden');
+    document.getElementById('fileInput').value = '';
+    document.getElementById('inputAjusteManual').value = '';
+}
+
+function mostrarErro(msg) {
+    document.getElementById('textoErro').textContent = '⚠️ ' + msg;
+    document.getElementById('alertaErro').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(esconderErro, 6000);
+}
+function esconderErro() { document.getElementById('alertaErro').classList.add('hidden'); }
+
+// ─── Painel Gemini API Key ───
+function carregarKeySalva() {
+    const key = localStorage.getItem('eds_gemini_key') || '';
+    if(key) document.getElementById('inputGeminiKey').value = key;
+}
+carregarKeySalva();
+
+function mostrarPainelKey() {
+    document.getElementById('painelApiKey').classList.remove('hidden');
+    document.getElementById('painelApiKey').scrollIntoView({ behavior: 'smooth' });
+}
+function ocultarPainelKey() { document.getElementById('painelApiKey').classList.add('hidden'); }
+
+async function salvarGeminiKey() {
+    const key = document.getElementById('inputGeminiKey').value.trim();
+    if (!key || !key.startsWith('AIza')) { alert('Cole uma chave válida (começa com AIza...)'); return; }
+
+    localStorage.setItem('eds_gemini_key', key);
+    document.getElementById('statusGeminiKey').textContent = '✅ Chave salva no navegador! Gerando localmente agora.';
+    document.getElementById('statusGeminiKey').style.display = 'block';
+    setTimeout(ocultarPainelKey, 2500);
+}
+</script>
+</body>
+</html>

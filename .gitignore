@@ -1,0 +1,4 @@
+﻿server/chave-vertex.json
+node_modules/
+.env
+*.json
