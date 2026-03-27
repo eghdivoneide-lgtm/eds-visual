@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+app.use(express.static(path.join(__dirname, '..')));
 const cors = require('cors');
 const { GoogleAuth } = require('google-auth-library');
 const path = require('path');
