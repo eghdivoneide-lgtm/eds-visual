@@ -7,7 +7,7 @@
     <!-- PWA Config -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=EDS+Visual&background=0D8ABC&color=fff&size=192">
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=EDShh+Visual&background=0D8ABC&color=fff&size=192">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -567,7 +567,7 @@ High quality, professional artistic result, detailed and expressive.`;
         // Pega a chave do localStorage para envio com o header Bearer
         const apiKeyLocal = localStorage.getItem('eds_gemini_key');
 
-        const response = await fetch('/.netlify/functions/api/gerar-imagem', {
+        const response = await fetch('/api/gerar-imagem', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
