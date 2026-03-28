@@ -302,7 +302,7 @@
             <button onclick="ocultarPainelKey()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:#92400e;">✕</button>
         </div>
         <div style="display:flex;gap:8px;">
-            <input type="password" id="inputGeminiKey" placeholder="Cole sua chave AIza... aqui"
+            <input type="password" id="inputGeminiKey" placeholder="Cole sua chave da API..."
                 style="flex:1;padding:12px;border:2px solid #fcd34d;border-radius:8px;font-size:14px;outline:none;background:white;color:black;"
                 onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#fcd34d'">
             <button onclick="salvarGeminiKey()"
@@ -743,7 +743,7 @@ function ocultarPainelKey() { document.getElementById('painelApiKey').classList.
 
 async function salvarGeminiKey() {
     const key = document.getElementById('inputGeminiKey').value.trim();
-    if (!key || !key.startsWith('AIza')) { alert('Cole uma chave válida (começa com AIza...)'); return; }
+    if (!key) { alert('Cole uma chave válida'); return; }
 
     localStorage.setItem('eds_gemini_key', key);
     document.getElementById('statusGeminiKey').textContent = '✅ Chave salva no navegador! Gerando localmente agora.';

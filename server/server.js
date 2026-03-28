@@ -53,8 +53,8 @@ app.get('/health', (req, res) => res.json({
 
 app.post('/api/configurar-key', (req, res) => {
   const { geminiApiKey } = req.body;
-  if (!geminiApiKey || !geminiApiKey.startsWith('AIza'))
-    return res.status(400).json({ erro: 'API Key inválida. Deve começar com AIza' });
+  if (!geminiApiKey || !(geminiApiKey.startsWith('AIza') || geminiApiKey.startsWith('AQ.')))
+    return res.status(400).json({ erro: 'API Key inválida. Deve começar com AIza ou AQ.' });
   config.geminiApiKey = geminiApiKey;
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
   console.log('[EDS Visual] ✅ Gemini API Key configurada!');
@@ -232,7 +232,7 @@ app.post('/api/gerar-imagem', async (req, res) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const clientKey = authHeader.split(' ')[1];
-        if (clientKey && clientKey.startsWith('AIza')) {
+        if (clientKey && (clientKey.startsWith('AIza') || clientKey.startsWith('AQ.'))) {
             tempApiKey = clientKey;
         }
     }
