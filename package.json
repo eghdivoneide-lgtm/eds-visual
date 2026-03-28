@@ -4,7 +4,7 @@
   "description": "EDS Visual PWA & Netlify Serverless Backend",
   "scripts": {
     "build": "echo 'No build step required for frontend'",
-    "start": "netlify dev"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "express": "^4.18.2",

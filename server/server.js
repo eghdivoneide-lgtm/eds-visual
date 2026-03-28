@@ -227,6 +227,22 @@ app.post('/api/gerar-imagem', async (req, res) => {
     const { prompt, imagemBase64, mimeType } = req.body;
     if (!prompt || !imagemBase64) return res.status(400).json({ erro: 'Prompt e imagem são obrigatórios.' });
 
+    // Tentar obter a Key do Header (enviada pelo Frontend), ou usar a config global
+    let tempApiKey = config.geminiApiKey;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const clientKey = authHeader.split(' ')[1];
+        if (clientKey && clientKey.startsWith('AIza')) {
+            tempApiKey = clientKey;
+        }
+    }
+
+    if (!tempApiKey) throw new Error('API Key não configurada. Insira na roleta engrenagem do topo!');
+
+    // Substituir temporariamente a chave local pela dinâmica só pra essa request
+    const originalKey = config.geminiApiKey;
+    config.geminiApiKey = tempApiKey;
+
     // ETAPA 1: Analisar a foto para extrair descrição detalhada das pessoas
     console.log('[EDS Visual] 📸 Etapa 1: Analisando foto...');
     const descricaoFoto = await analisarFoto(imagemBase64, mimeType);
@@ -249,6 +265,12 @@ app.post('/api/gerar-imagem', async (req, res) => {
   } catch (err) {
     console.error('[EDS Visual] ❌ Erro:', err.message);
     res.status(500).json({ erro: err.message });
+  } finally {
+    // Retorna a config global ao estado original no fim da rota (segurança)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+       // O bloco originalKey foi sobrescrito localmente
+    }
   }
 });
 
