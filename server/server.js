@@ -4,27 +4,43 @@ const { GoogleAuth } = require('google-auth-library');
 const path = require('path');
 const fs = require('fs');
 
-const KEY_PATH = path.join(__dirname, 'chave-vertex.json');
 const CONFIG_PATH = path.join(__dirname, 'config.json');
 const PROJECT_ID = 'gen-lang-client-0033369940';
 const LOCATION = 'us-central1';
 
+// Carregar config (Gemini key do env ou do arquivo)
 let config = {};
 if (fs.existsSync(CONFIG_PATH)) {
   try { config = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8')); } catch {}
 }
+if (process.env.GEMINI_API_KEY) {
+  config.geminiApiKey = process.env.GEMINI_API_KEY;
+}
 
-const auth = new GoogleAuth({
-  keyFile: KEY_PATH,
-  scopes: [
-    'https://www.googleapis.com/auth/cloud-platform',
-    'https://www.googleapis.com/auth/generative-language',
-  ],
-});
+// Autenticação Vertex: variável de ambiente ou arquivo local
+let auth;
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  auth = new GoogleAuth({
+    credentials,
+    scopes: [
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/generative-language',
+    ],
+  });
+} else {
+  const KEY_PATH = path.join(__dirname, 'chave-vertex.json');
+  auth = new GoogleAuth({
+    keyFile: KEY_PATH,
+    scopes: [
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/generative-language',
+    ],
+  });
+}
 
 const app = express();
-app.use(express.static(path.join(__dirname, '..')));
-
+app.use(express.static(path.join(__dirname, '../')));
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.static(path.join(__dirname, '..')));
