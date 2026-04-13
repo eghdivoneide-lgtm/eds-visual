@@ -40,10 +40,10 @@ if (process.env.GOOGLE_CREDENTIALS_JSON) {
 }
 
 const app = express();
-app.use(express.static(path.join(__dirname, '../')));
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
-app.use(express.static(path.join(__dirname, '..')));
+
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'EDS Visual API' }));
 
 app.get('/health', (req, res) => res.json({
   status: 'ok',
